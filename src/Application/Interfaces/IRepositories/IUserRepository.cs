@@ -1,6 +1,5 @@
 ﻿
 using Domain.Models;
-using Domain.Models.DTOs;
 
 namespace Application.Interfaces.IRepositories
 {

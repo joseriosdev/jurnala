@@ -1,7 +1,5 @@
 ﻿using Domain.Enums;
 using Domain.Models.Commons;
-using System;
-using System.Collections.Generic;
 
 namespace Domain.Models
 {

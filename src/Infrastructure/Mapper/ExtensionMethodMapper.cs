@@ -2,7 +2,6 @@
 using Domain.Models;
 using Domain.Models.DTOs;
 using Infrastructure.Models;
-using System.Diagnostics;
 
 namespace Infrastructure.Mapper
 {

@@ -3,11 +3,11 @@ using Application.Interfaces.IServices;
 using Infrastructure.Implementations.Repositiories;
 using Infrastructure.Implementations.Services;
 using Infrastructure.Models;
-using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Presentation.Web.REST.Filters;
+using Presentation.Web.REST.Middlewares;
 using System.Reflection;
 using System.Text;
 
@@ -15,7 +15,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddHealthChecks();
-builder.Services.AddControllers();
+builder.Services.AddControllers(config =>
+{
+    config.Filters.Add(typeof(ExceptionFilter));
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(opts =>
@@ -69,6 +72,8 @@ builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("ManagerOnly", policy => policy.RequireClaim("Role", "MANAGER"));
 });
+
+builder.Services.AddTransient<RateLimitMiddleware>();
 builder.Services.AddDbContext<JurnalaContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("jurnalV1")));
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -85,6 +90,8 @@ builder.Services.AddCors(options =>
                                 .AllowAnyHeader();
                     });
 });
+
+
 
 
 var app = builder.Build();
@@ -106,11 +113,11 @@ app.UseHttpsRedirection();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<RateLimitMiddleware>();
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
     endpoints.MapHealthChecks("/health");
 });
-app.MapControllers();
 
 app.Run();
