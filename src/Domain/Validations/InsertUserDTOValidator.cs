@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace Domain.Validations
 {
-    public class InsertUserDTOValidator : AbstractValidator<InsertUserDTO>
+    public class InsertUserDTOValidator : AbstractValidator<RegisterUserDTO>
     {
         public InsertUserDTOValidator()
         {

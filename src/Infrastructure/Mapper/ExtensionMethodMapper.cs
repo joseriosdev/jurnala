@@ -7,7 +7,7 @@ namespace Infrastructure.Mapper
 {
     public static class ExtensionMethodMapper
     {
-        public static User MapToUser(this InsertUserDTO dto)
+        public static User MapToUser(this RegisterUserDTO dto)
         {
             var user = new User();
             user.FirstName = dto.FirstName;
@@ -55,7 +55,7 @@ namespace Infrastructure.Mapper
             return user;
         }
 
-        public static DomainUser MapToDomainUser(this InsertUserDTO dto)
+        public static DomainUser MapToDomainUser(this RegisterUserDTO dto)
         {
             var user = new DomainUser();
             user.FirstName = dto.FirstName;

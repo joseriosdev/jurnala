@@ -19,7 +19,7 @@ namespace Infrastructure.Implementations.Services
             _userRepository = userRepository;
         }
 
-        public async Task<DisplaySimpleUserDTO?> CreateUserAsync(InsertUserDTO userToCreate, CancellationToken ct)
+        public async Task<DisplaySimpleUserDTO?> CreateUserAsync(RegisterUserDTO userToCreate, CancellationToken ct)
         {
             this.ValidateUser(userToCreate);
             DomainUser? repeatedUser = await FindUserByEmailAsync(userToCreate.Email!, ct);
@@ -43,7 +43,7 @@ namespace Infrastructure.Implementations.Services
             return await _userRepository.ReadUserByEmailAsync(email, ct);
         }
 
-        private void ValidateUser(InsertUserDTO user)
+        private void ValidateUser(RegisterUserDTO user)
         {
             var validator = new InsertUserDTOValidator();
             validator.ValidateAndThrow(user);
