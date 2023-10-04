@@ -15,9 +15,13 @@ namespace Presentation.Web.REST.Filters
 
         public void OnException(ExceptionContext ctx)
         {
-            string msn = $"The Application '{_hostEnv.ApplicationName}' failed with message: {ctx.Exception.Message}." +
-                $"Of Type: {ctx.Exception.GetType()}";
-            var error = new JurnalaError { StatusCode = "500", Message =  msn };
+            string msn = $"The Application '{_hostEnv.ApplicationName}' failed with message: {ctx.Exception.Message}.";
+            var error = new JurnalaError
+            {
+                StatusCode = "500",
+                Message =  msn,
+                ErrorType = ctx.Exception.GetType().ToString()
+            };
             ctx.Result = new JsonResult(error) { StatusCode = 500 };
         }
     }

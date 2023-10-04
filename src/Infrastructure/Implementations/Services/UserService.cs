@@ -19,13 +19,13 @@ namespace Infrastructure.Implementations.Services
             _userRepository = userRepository;
         }
 
-        public async Task<DisplaySimpleUserDTO?> CreateUserAsync(RegisterUserDTO userToCreate, CancellationToken ct)
+        public async Task<DisplaySimpleUserDTO?> InsertUserAsync(RegisterUserDTO userToCreate, CancellationToken ct)
         {
             this.ValidateUser(userToCreate);
             DomainUser? repeatedUser = await FindUserByEmailAsync(userToCreate.Email!, ct);
 
             if (repeatedUser is not null)
-                throw new InvalidOperationException();
+                throw new InvalidOperationException("User already exits");
             
             DomainUser user = userToCreate.MapToDomainUser();
             user.Id = Guid.NewGuid();
@@ -41,6 +41,12 @@ namespace Infrastructure.Implementations.Services
         public async Task<DomainUser?> FindUserByEmailAsync(string email, CancellationToken ct)
         {
             return await _userRepository.ReadUserByEmailAsync(email, ct);
+        }
+
+        public async Task<string> RemoveUserAsync(string email, CancellationToken ct)
+        {
+            await _userRepository.SoftDeleteUserAsync(email, ct);
+            return $"User {email} was deleted at {DateTime.UtcNow}";
         }
 
         private void ValidateUser(RegisterUserDTO user)

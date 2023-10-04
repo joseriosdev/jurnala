@@ -63,11 +63,12 @@ namespace Presentation.Web.REST.Controllers
         /// <remarks>
         /// I had issues with the 'CreatedAtAction' so I am returnin 200 when success!
         /// </remarks>
-        /// <response code="200">Ok, User created and JWT generated</response>
+        /// <response code="201">Created, User created and JWT generated</response>
         /// <response code="400">Bad Request, double check input</response>
         /// <response code="409">Conflict, user email already used</response>
         [HttpPost("register")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ActionName(nameof(PostRegisterAsync))]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(string))]
         public async Task<IActionResult> PostRegisterAsync([FromBody] RegisterUserDTO user, CancellationToken ct)
@@ -79,10 +80,10 @@ namespace Presentation.Web.REST.Controllers
 
             try
             {
-                DisplaySimpleUserDTO? userCreated = await _userService.CreateUserAsync(user, ct);
+                DisplaySimpleUserDTO? userCreated = await _userService.InsertUserAsync(user, ct);
                 string token = CreateJWT(
                     userCreated!.FullName!, userCreated.Email!, userCreated.Role!, userCreated.Id!);
-                return Ok(new { Token = token, Response = userCreated });
+                return CreatedAtAction(nameof(PostRegisterAsync), new { Token = token, Response = userCreated });
             }
             catch (Exception ex)
             {

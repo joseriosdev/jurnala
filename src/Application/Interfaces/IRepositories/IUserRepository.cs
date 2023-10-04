@@ -7,5 +7,7 @@ namespace Application.Interfaces.IRepositories
     {
         Task<DomainUser> CreateUserAsync(DomainUser userToCreate, CancellationToken ct);
         Task<DomainUser?> ReadUserByEmailAsync(string email, CancellationToken ct);
+        Task<DomainUser> UpdateUserAsync(DomainUser userToUpdate, CancellationToken ct);
+        Task SoftDeleteUserAsync(string email, CancellationToken ct);
     }
 }
