@@ -9,5 +9,6 @@ namespace Application.Interfaces.IServices
         Task<DisplaySimpleUserDTO?> InsertUserAsync(RegisterUserDTO userToCreate, CancellationToken ct);
         Task<DomainUser?> FindUserByEmailAsync(string email, CancellationToken ct);
         Task<string> RemoveUserAsync(string email, CancellationToken ct);
+        Task<UpdateUserDTO?> EditUserAsync(string email, UpdateUserDTO userToUpdate, CancellationToken ct);
     }
 }

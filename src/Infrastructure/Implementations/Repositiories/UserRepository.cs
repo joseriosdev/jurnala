@@ -4,6 +4,8 @@ using Domain.Models;
 using Infrastructure.Mapper;
 using Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Utils;
 
 namespace Infrastructure.Implementations.Repositiories
 {
@@ -33,7 +35,9 @@ namespace Infrastructure.Implementations.Repositiories
 
         public async Task<DomainUser> UpdateUserAsync(DomainUser userToUpdate, CancellationToken ct)
         {
-            User userToUpdateInDB = userToUpdate.MapToUser();
+            User? userToUpdateInDB = await _context.Users.FindAsync(userToUpdate.Id.ToString(), ct);
+            if (userToUpdateInDB is null) throw new KeyNotFoundException(JurnalaErrorMessage.USER_NOT_FOUND);
+            ObjectMapping.UpdatePropertiesWithMatchingNames(userToUpdateInDB, userToUpdate);
             _context.Entry(userToUpdateInDB).State = EntityState.Modified;
             await _context.SaveChangesAsync(ct);
             return userToUpdateInDB.MapToDomainUser();
@@ -56,6 +60,11 @@ namespace Infrastructure.Implementations.Repositiories
             }
             else
                 throw new KeyNotFoundException(JurnalaErrorMessage.USER_NOT_FOUND);
+        }
+
+        private User UpdateUserFromDomainUser(User userToUpdate, DomainUser userUpdater)
+        {
+            return null;
         }
     }
 }

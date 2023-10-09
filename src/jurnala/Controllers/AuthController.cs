@@ -1,6 +1,8 @@
 ﻿using Application.Interfaces.IServices;
+using Domain.Constants;
 using Domain.Models;
 using Domain.Models.DTOs;
+using Domain.Models.Exception;
 using Infrastructure.ExtensionMethods;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -46,11 +48,21 @@ namespace Presentation.Web.REST.Controllers
                     return Ok(token);
                 }
                 else
-                    return Unauthorized("Incorrect Password");
+                    return Unauthorized(new JurnalaError()
+                    {
+                        StatusCode = JurnalaStatusCodes.CODE_401,
+                        Message = JurnalaErrorMessage.AUTH_WRONG_PASSWORD,
+                        ErrorType = JurnalaStatusCodes.UNAUTHORIZED
+                    });
             }
             else
             {
-                return Unauthorized("User does not exists, please register first.");
+                return Unauthorized(new JurnalaError()
+                {
+                    StatusCode = JurnalaStatusCodes.CODE_401,
+                    Message = JurnalaErrorMessage.AUTH_USER_DOES_NOT_EXITS,
+                    ErrorType = JurnalaStatusCodes.UNAUTHORIZED
+                });
             }
         }
 
@@ -76,7 +88,12 @@ namespace Presentation.Web.REST.Controllers
             DomainUser? checkUserExistence = await _userService.FindUserByEmailAsync(user.Email!, ct);
 
             if (checkUserExistence is not null)
-                return Conflict("User already exists with email: " + user.Email);
+                return BadRequest(new JurnalaError()
+                {
+                    StatusCode = JurnalaStatusCodes.CODE_400,
+                    Message = JurnalaErrorMessage.AUTH_USER_EXITS_ADD_EMAIL + user.Email,
+                    ErrorType = JurnalaStatusCodes.BAD_REQUEST
+                });
 
             try
             {

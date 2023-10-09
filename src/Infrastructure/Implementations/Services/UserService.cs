@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces.IRepositories;
 using Application.Interfaces.IServices;
+using Domain.Constants;
 using Domain.Enums;
 using Domain.Models;
 using Domain.Models.DTOs;
@@ -25,7 +26,7 @@ namespace Infrastructure.Implementations.Services
             DomainUser? repeatedUser = await FindUserByEmailAsync(userToCreate.Email!, ct);
 
             if (repeatedUser is not null)
-                throw new InvalidOperationException("User already exits");
+                throw new InvalidOperationException(JurnalaErrorMessage.USER_ALREADY_EXITS);
             
             DomainUser user = userToCreate.MapToDomainUser();
             user.Id = Guid.NewGuid();
@@ -33,7 +34,7 @@ namespace Infrastructure.Implementations.Services
             user.Role = UserRoles.EMPLOYEE;
             user.Password = user.Password!.GetSha256();
             user.IsActive = true;
-            user.CreatedAt = DateTime.Now;
+            user.CreatedAt = DateTime.UtcNow;
             user = await _userRepository.CreateUserAsync(user, ct);
             return user.MapToDisplaySimpleUserDTO();
         }
@@ -45,8 +46,16 @@ namespace Infrastructure.Implementations.Services
 
         public async Task<string> RemoveUserAsync(string email, CancellationToken ct)
         {
+            if (!email.IsValidEmailAddress())
+                throw new ArgumentException(JurnalaErrorMessage.TEXT_WRONG_EMAIL, nameof(email));
+
             await _userRepository.SoftDeleteUserAsync(email, ct);
             return $"User {email} was deleted at {DateTime.UtcNow}";
+        }
+
+        public Task<UpdateUserDTO?> EditUserAsync(string email, UpdateUserDTO userToUpdate, CancellationToken ct)
+        {
+            throw new NotImplementedException();
         }
 
         private void ValidateUser(RegisterUserDTO user)
@@ -54,5 +63,7 @@ namespace Infrastructure.Implementations.Services
             var validator = new InsertUserDTOValidator();
             validator.ValidateAndThrow(user);
         }
+
+        
     }
 }
