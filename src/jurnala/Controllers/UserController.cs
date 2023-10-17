@@ -4,8 +4,10 @@ using Domain.Models;
 using Domain.Models.DTOs;
 using Domain.Models.Exception;
 using Infrastructure.Mapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using System.Security.Claims;
 
 namespace jurnala.Controllers
 {
@@ -21,6 +23,26 @@ namespace jurnala.Controllers
         {
             _logger = logger;
             _userService = userService;
+        }
+
+        /// <summary>
+        /// Gets the description of the currently authenticated user
+        /// </summary>
+        /// <param name="ct">Cancellation Token</param>
+        /// <returns>User to Display Object</returns>
+        /// <response code="200">Found and return the correct user</response>
+        /// <response code="404">Not Found</response>
+        /// <response code="401">Unauthorized</response>
+        [HttpGet("me")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DomainUser))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetCurrentAuthUserAsync(CancellationToken ct)
+        {
+            string userEmail = HttpContext.User.FindFirstValue(ClaimTypes.Email);
+            DomainUser? userFound = await _userService.FindUserByEmailAsync(userEmail, ct);
+            if (userFound is null) return NotFound();
+            return Ok(userFound);
         }
 
         /// <summary>

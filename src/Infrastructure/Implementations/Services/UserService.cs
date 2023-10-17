@@ -58,6 +58,9 @@ namespace Infrastructure.Implementations.Services
             throw new NotImplementedException();
         }
 
+
+        // ********** PRIVATE METHODS **********
+
         private void ValidateUser(RegisterUserDTO user)
         {
             var validator = new InsertUserDTOValidator();
